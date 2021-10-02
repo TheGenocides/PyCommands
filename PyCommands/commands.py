@@ -2,7 +2,7 @@ import asyncio
 from .core import Command
 from typing import Callable, Type, Set
 
-class CommandHandler():
+class BaseCommandMaker():
 	def __init__(self, prefix: str, **kwargs):
 		self.prefix = prefix
 		self.description=kwargs.get("description") or None
@@ -44,3 +44,5 @@ class CommandHandler():
 						await command.func()
 		asyncio.run(run_(self))
 			
+class CommandMaker(BaseCommandMaker):
+	pass
