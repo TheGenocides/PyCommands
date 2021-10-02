@@ -2,13 +2,7 @@ import asyncio
 from .core import Command
 from typing import Callable, Type, Set
 from colorama import Fore, Back, Style
-
-
-SUCCESS=200
-DISABLED=69
-UN_COMMAND=50
-FAILED=30
-EXIT=0
+from .constants import *
 
 class BaseCommandMaker():
 	def __init__(self, prefix: str, **kwargs):
