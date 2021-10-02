@@ -31,7 +31,7 @@ class BaseCommandMaker():
 
 
 	def run(self):
-		async def run_(self):
+		async def run_():
 			while True:
 				cmd: str = input("> ")
 				if not cmd.startswith(self.prefix):
@@ -42,7 +42,7 @@ class BaseCommandMaker():
 						print("Command not found!")
 					else:
 						await command.func()
-		asyncio.run(run_(self))
+		asyncio.run(run_())
 			
 class CommandMaker(BaseCommandMaker):
 	pass
