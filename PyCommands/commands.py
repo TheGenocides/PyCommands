@@ -31,10 +31,6 @@ class BaseCommandMaker():
     def internal_commands(self) -> Set:
         return set(self._internal_commands.values())
 
-    @property
-    def error_cache(self) -> Dict[int, str]:
-        return self._error_cache_
-
     def register_command(self, command):
         if isinstance(command, Command):
             self._commands[command.name] = command
