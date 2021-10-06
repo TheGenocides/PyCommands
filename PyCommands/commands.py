@@ -1,7 +1,7 @@
 import asyncio
 from .core import Command
 from typing import Callable, Type, Set
-from colorama import Fore, Back, Style
+from colorama import Fore
 
 
 SUCCESS=200
