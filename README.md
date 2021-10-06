@@ -18,7 +18,7 @@ def hello(someone): #support args, as of rigth now PyCommands doesnt support kwa
 
 @engine.command("plus", description="Add numbers")
 def plus(a:int, b:int): #make sure to typehinted!
-    engine.response(a + b) #Will be called with !plus, and it will print the mathematical equation
+    engine.response(a + b) #Will be called with !plus <number> <number>, and it will print the mathematical equation
 
 engine.run() #Run the CommandMaker and make a loop, it will not break unless you use the exit command or rerun the file
 ```
