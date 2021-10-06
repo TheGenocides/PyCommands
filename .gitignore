@@ -1,2 +1,5 @@
 main.py
 __pycache__
+.breakpoints
+poetry.lock
+pyproject.toml
