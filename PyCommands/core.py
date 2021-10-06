@@ -10,4 +10,3 @@ class Command():
 
 	def disable(self):
 		self.disabled = True
-		
