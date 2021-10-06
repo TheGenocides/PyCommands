@@ -3,7 +3,7 @@ from typing import Callable, Type, Set, List, Dict, Union
 from datetime import datetime
 from PyCommands.__init__ import __version__
 from .core import Command, InternalCommand, Color
-from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, UN_COMMAND, EXIT
+from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, FAILED, UN_COMMAND, EXIT
 
 def _error_handler(command: str, arguments: List[str], error: Exception):
 	if command == "help":
@@ -11,10 +11,10 @@ def _error_handler(command: str, arguments: List[str], error: Exception):
 			print(Color.yellow() + f"[{UN_COMMAND}]: " + Color.red() + f"Unknown Command: {' '.join(arguments)}") 
 		
 		elif isinstance(error, TypeError):
-			print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: " + Color.red() + f"Too many arguments passed for command '{command}': {' '.join(arguments)}")  
+			print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: Too many arguments passed for command '{command}': {' '.join(arguments)}")  
 
 class BaseCommandMaker():
-    def __init__(self, prefix: str, **kwargs):
+    def __init__(self, *,prefix: str, **kwargs):
         self.prefix = prefix
         self.name = kwargs.get("name") or "User101"
         self.description = kwargs.get("description") or None
@@ -83,8 +83,8 @@ class BaseCommandMaker():
         for commands in self._internal_commands_(): 
             add_internal_command(commands)
 
-    def response(self, *text: Union[str, int], color: Color = Color.white()):
-        print(color + ''.join(text))
+    def response(self, text: Union[str, int], color: Color = Color.white()):
+        print(color + f"{text}")
 
     def run(self):
         async def run_():
@@ -107,14 +107,16 @@ class BaseCommandMaker():
                 else:
                     command=self.get_command(cmd.strip(self.prefix))
                     if not command:
-                        print(Color.yellow() + f"[{UN_COMMAND}]: " + Color.red() + f"Unknown Command: {promt}"
+                        print(Color.red() + f"[{UN_COMMAND}]: Unknown Command: {promt}"
                     )
                     else:
                         if command.disabled:
-                            print(Color.yellow() + f"[{DISABLED}]: " + Color.red() + f"Disabled Command: {command.name}")
+                            print(Color.yellow() + f"[{DISABLED}]: Disabled Command: {command.name}")
                             
                         else:
                             await command.invoke(*arguments)
+                            
+
                             
 								
         asyncio.run(run_())

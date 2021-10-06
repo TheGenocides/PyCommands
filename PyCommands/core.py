@@ -1,47 +1,89 @@
 import asyncio
 import random as ran
 from colorama import Fore
-from typing import List, Callable
+from typing import List, Dict, Callable, Union
+from inspect import signature
 from .constants import TOO_MANY_ARGUMENTS, FAILED
 
+ERROR_CODE=[30, 40, 41, 50, 100, 101]
+
+def ErrorHandler(error:Exception):
+    print(str(error))
 class Command():
     def __init__(self, name: str, *, description: str = None, func: Callable, **kwargs):
         self.name = name
         self.description = description or None
         self.func = func
         self.disabled = kwargs.get("disabled") or False
-        
+
+    @property 
+    def arguments(self):
+        sig=str(signature(self.func)).strip("(").strip(")").replace(",", " ").replace("*", " ").replace(":", " ").replace("int", " ").replace("str", " ").replace(" ", "")
+        return sig if sig else None
+
     def __repr__(self):
         return "<Command: <name: {0.name} description: {0.description} disabled: {0.disabled} func: {0.func}>>".format(self)
 
     def disable(self):
         self.disabled = True
 
-    async def invoke(self, *args):
-        types=list(self.func.__annotations__.values())
-        for arg in args:
-            for type in types:
+    async def injected(self, args):
+        injected=[]
+        arguments={} 
+        if self.arguments:
+            for n, arg in enumerate(args):
                 try:
-                    if type(arg) == type: #Check if you can make a string to integer, if not it will raised ValueError then it'll get catch with except. 
-                        ...
- 
+                    ty=self.func.__annotations__.get(self.arguments[n])
+                    arguments[self.arguments[n]] = (arg, ty if ty else type(arg))
+                except Exception as e:
+                    raise e
+        
+            for k, tup in arguments.items():
+                try:
+                    arg=tup[0]
+                    tp=tup[1]
+                    if type(arg) == tp:
+                        injected.append(arg)
+
+                    elif not type(arg) == tp:
+                        injected.append(tp(arg))
+
                 except ValueError as error:
-                    print(Color.yellow() + f"[{FAILED}]: " + f"Failed to invoke '{self.name}': it raised an exception: {error}")
-                    return
-        try:
-            if asyncio.iscoroutinefunction(self.func):
-                await self.func(*args)
-            else:
-                self.func(*args)
-        except TypeError:
+                    print(Color.red() + f"[{FAILED}]: Failed to invoke '{self.name}': it raised an exception: {error}")
+                    return 
+
+        
+        if not injected:
+            return 0
+              
+        else:
+            return injected
+
+    async def invoke(self, *args): 
+        injected=await self.injected(args)
+        
+        if not self.arguments and args:
+            print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: Too many arguments passed for command '{self.name}': {' '.join(args)}")  
+            return
+            
+        if injected == 0:
             try:
                 if asyncio.iscoroutinefunction(self.func):
                     await self.func()
                 else:
                     self.func()
-            except TypeError:
-                print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: Too many arguments passed for command '{self.name}': {' '.join(args)}")            
+            except Exception as error:
+                raise error
 
+        else:
+            try:
+                if asyncio.iscoroutinefunction(self.func):
+                    await self.func(*injected)
+                else:
+                    self.func(*injected)
+            except Exception as error:
+                raise error
+            
 class InternalCommand(Command): #This is for internal command like exit etc. You should be using class Command(): for making Command
     def __init__(self, name: str, description: str, func: List[Callable]):
         super().__init__(name, description=description, func=func, disabled=False)
