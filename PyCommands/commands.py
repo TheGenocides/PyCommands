@@ -3,7 +3,7 @@ from typing import Callable, Type, Set, List, Dict, Union
 from datetime import datetime
 from PyCommands.__init__ import __version__
 from .core import Command, InternalCommand, Color
-from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, FAILED, UN_COMMAND, EXIT
+from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, UN_COMMAND, EXIT
 
 def _error_handler(command: str, arguments: List[str], error: Exception):
 	if command == "help":
