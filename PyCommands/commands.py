@@ -83,7 +83,7 @@ class BaseCommandMaker():
         for commands in self._internal_commands_(): 
             add_internal_command(commands)
 
-    def response(self, text: Union[str, int], color: Color = Color.white()):
+    def respond(self, text: Union[str, int], color: Color = Color.white()):
         print(color + f"{text}")
 
     def run(self):
@@ -94,7 +94,7 @@ class BaseCommandMaker():
                 cmd=promt.split(" ")[0]
                 indexs=len(promt.split(" ")) - 1
                 arguments=promt.split(" ")[-indexs:] if not indexs == 0 else [' ']
-                if not cmd.startswith(self.prefix) or cmd is self.prefix: 	
+                if not cmd.startswith(self.prefix) or cmd == self.prefix:
                     if cmd.lower() in self._internal_commands.keys():
                         funcs=self.get_internal_command(cmd).func
                         for func in funcs:
