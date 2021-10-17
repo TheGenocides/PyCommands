@@ -57,6 +57,7 @@ class Command():
         else:
             return injected
 
+
     async def invoke(self, *args): 
         """Invoke the command with the given arguments"""
         injected=await self.injected(args)
