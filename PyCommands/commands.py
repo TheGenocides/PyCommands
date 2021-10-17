@@ -3,7 +3,7 @@ from typing import Callable, Type, Set, List, Dict, Union
 from datetime import datetime
 from PyCommands.__init__ import __version__
 from .core import Command, InternalCommand, Color
-from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, FAILED, UN_COMMAND, EXIT
+from .constants import HELPCOMMAND, SUCCESS, DISABLED, TOO_MANY_ARGUMENTS, UN_COMMAND, EXIT
 
 def _error_handler(command: str, arguments: List[str], error: Exception):
 	if command == "help":
@@ -44,7 +44,7 @@ class BaseCommandMaker():
     def command(self, name: str, *,description: str = None, cls: Type[Command] = Command, **kwargs) -> Callable: 
         if ' ' in name:
             raise TypeError("Command name cannot have space!")
-        def decorator(func) -> Command: #Not supported: list, dict, typing.Union, typing.Optional. Supported: str, int
+        def decorator(func) -> Command: 
             result = cls(name, description=description, func=func, **kwargs)
             if self.get_internal_command(result.name) or self.get_command(result.name):
                 raise TypeError("That command name is already exist!")
@@ -117,8 +117,6 @@ class BaseCommandMaker():
                             await command.invoke(*arguments)
                             
 
-                            
-								
         asyncio.run(run_())
 
 class CommandMaker(BaseCommandMaker):

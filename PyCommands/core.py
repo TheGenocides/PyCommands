@@ -1,14 +1,10 @@
 import asyncio
 import random as ran
 from colorama import Fore
-from typing import List, Dict, Callable, Union
+from typing import List, Callable
 from inspect import signature
 from .constants import TOO_MANY_ARGUMENTS, FAILED
 
-ERROR_CODE=[30, 40, 41, 50, 100, 101]
-
-def ErrorHandler(error:Exception):
-    print(str(error))
 class Command():
     def __init__(self, name: str, *, description: str = None, func: Callable, **kwargs):
         self.name = name
@@ -28,6 +24,7 @@ class Command():
         self.disabled = True
 
     async def injected(self, args):
+        """Injected Typehintes to arguments."""
         injected=[]
         arguments={} 
         if self.arguments:
@@ -35,8 +32,9 @@ class Command():
                 try:
                     ty=self.func.__annotations__.get(self.arguments[n])
                     arguments[self.arguments[n]] = (arg, ty if ty else type(arg))
-                except Exception as e:
-                    raise e
+                except IndexError:
+                    print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: Too many arguments passed for command '{self.name}': {' '.join(args)}")
+                    return 1
         
             for k, tup in arguments.items():
                 try:
@@ -50,7 +48,7 @@ class Command():
 
                 except ValueError as error:
                     print(Color.red() + f"[{FAILED}]: Failed to invoke '{self.name}': it raised an exception: {error}")
-                    return 
+                    return 1
 
         
         if not injected:
@@ -60,20 +58,24 @@ class Command():
             return injected
 
     async def invoke(self, *args): 
+        """Invoke the command with the given arguments"""
         injected=await self.injected(args)
         
         if not self.arguments and args:
             print(Color.yellow() + f"[{TOO_MANY_ARGUMENTS}]: Too many arguments passed for command '{self.name}': {' '.join(args)}")  
             return
+
+        if injected == 1:
+            return
             
-        if injected == 0:
+        elif injected == 0:
             try:
                 if asyncio.iscoroutinefunction(self.func):
                     await self.func()
                 else:
                     self.func()
             except Exception as error:
-                raise error
+                print(Color.red() + f"[{FAILED}]: Failed to invoke '{self.name}': it raised an exception: {error}")
 
         else:
             try:
@@ -82,7 +84,7 @@ class Command():
                 else:
                     self.func(*injected)
             except Exception as error:
-                raise error
+                print(Color.red() + f"[{FAILED}]: Failed to invoke '{self.name}': it raised an exception: {error}")
             
 class InternalCommand(Command): #This is for internal command like exit etc. You should be using class Command(): for making Command
     def __init__(self, name: str, description: str, func: List[Callable]):
