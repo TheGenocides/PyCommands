@@ -6,8 +6,8 @@ from inspect import signature
 from .constants import TOO_MANY_ARGUMENTS, FAILED
 
 class Command():
-    def __init__(self, name: str, *, description: str = None, func: Callable, **kwargs):
-        self.name = name
+    def __init__(self, name: str = None, *, description: str = None, func: Callable, **kwargs):
+        self.name = name if name else func.__name__
         self.description = description or None
         self.func = func
         self.disabled = kwargs.get("disabled") or False
@@ -90,7 +90,7 @@ class InternalCommand(Command): #This is for internal command like exit etc. You
     def __init__(self, name: str, description: str, func: List[Callable]):
         super().__init__(name, description=description, func=func, disabled=False)
         self.name = name
-        self.description = description or None
+        self.description = description 
         self.func = func
 
     def  __repr__(self):

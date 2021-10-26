@@ -41,8 +41,8 @@ class BaseCommandMaker():
         else:
             raise TypeError("Command is not from 'Command' or 'InternalCommand' class")
 
-    def command(self, name: str, *,description: str = None, cls: Type[Command] = Command, **kwargs) -> Callable: 
-        if ' ' in name:
+    def command(self, name: str = None, *,description: str = None, cls: Type[Command] = Command, **kwargs) -> Callable: 
+        if name and ' ' in name:
             raise TypeError("Command name cannot have space!")
         def decorator(func) -> Command: 
             result = cls(name, description=description, func=func, **kwargs)
@@ -114,9 +114,7 @@ class BaseCommandMaker():
                             print(Color.yellow() + f"[{DISABLED}]: Disabled Command: {command.name}")
                             
                         else:
-                            await command.invoke(*arguments)
-                            
-
+                            await command.invoke(*arguments)        
         asyncio.run(run_())
 
 class CommandMaker(BaseCommandMaker):
