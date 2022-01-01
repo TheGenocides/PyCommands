@@ -14,11 +14,11 @@ engine=commands.CommandMaker(prefix="!", name="Timmy", description="Timmy is an 
 
 @engine.command(description="say hello to someone :)") #Set command name and the description
 def hello(someone): #support args, as of rigth now PyCommands doesnt support kwargs.
-    engine.response(f"hello {someone}") #function for printing msg
+    engine.respond(f"hello {someone}") #function for printing msg
 
 @engine.command(description="Add numbers")
 def plus(a:int, b:int): #make sure to typehinted!
-    engine.response(a + b) #Will be called with !plus <number> <number>, and it will print the mathematical equation
+    engine.respond(a + b) #Will be called with !plus <number> <number>, and it will print the mathematical equation
 
 engine.run() #Run the CommandMaker and make a loop, it will not break unless you use the exit command or rerun the file
 ```
